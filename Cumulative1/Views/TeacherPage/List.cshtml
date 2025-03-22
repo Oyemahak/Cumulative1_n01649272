@@ -1,0 +1,37 @@
+﻿﻿@model IEnumerable<Cumulative1.Models.Teacher>
+@{
+    ViewBag.Title = "List";
+}
+
+<div id="containerlist">
+
+    <h2>List of Teachers</h2>
+
+    <!-- Search Form with Submit Button-->
+    <form action="/TeacherPage/List" method="GET">
+        <label for="SearchKey">Search:</label>
+        <input type="text" name="SearchKey" id="SearchKey" autocomplete="off" />
+        <input type="submit" value="Search" />
+    </form>
+
+    <!-- Teacher Table with all the Required Columns -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var teacher in Model)
+            {
+                <tr>
+                    <td>@teacher.TeacherId</td>
+                    <td>@teacher.TeacherFname @teacher.TeacherLname</td>
+                    <td><a href="/TeacherPage/Show/@teacher.TeacherId">Show Details</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

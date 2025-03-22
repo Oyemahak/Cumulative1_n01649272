@@ -1,0 +1,44 @@
+﻿@model Cumulative1.Models.Teacher
+@{
+    ViewBag.Title = "Show";
+}
+
+<div id="containershow" class="container">
+    <nav class="my-3">
+        <a class="navlink" href="/TeacherPage/List">Back To Teachers</a>
+    </nav>
+    <h2>Teacher Information</h2>
+
+    <div class="mb-3">
+        <strong>ID:</strong> @Model.TeacherId
+    </div>
+    <div class="mb-3">
+        <strong>Employee Number:</strong> @Model.EmployeeNumber
+    </div>
+    <div class="mb-3">
+        <strong>Salary:</strong> @Model.Salary
+    </div>
+
+    <div class="mb-3">
+        <strong>Full Name:</strong> @Model.TeacherFname @Model.TeacherLname
+    </div>
+    <div class="mb-3">
+        <strong>Hire Date:</strong> @Model.HireDate
+    </div>
+    <div class="mb-3">
+        <strong>Courses:</strong>
+        @if (Model.Courses != null && Model.Courses.Any())
+        {
+            foreach (var _class in Model.Courses)
+            {
+                <div><a href="/Course/Show/@_class.CourseId">@_class.CourseCode</a> : @_class.CourseName</div>
+            }
+        }
+        else
+        {
+            <div>No Courses assigned</div>
+        }
+    </div>
+
+   
+</div>
