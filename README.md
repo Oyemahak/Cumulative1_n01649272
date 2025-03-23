@@ -48,6 +48,25 @@ The following table provides details about instructors, including their employee
 
 ---
 
+## 📂 Project Structure
+
+## Backend (Web API)
+
+| Component                   | Description                               |
+|-----------------------------|-------------------------------------------|
+| `SchoolDbContext.cs`         | Database context for MySQL connection.    |
+| `TeacherAPIController.cs`    | API Controller for retrieving teacher data. |
+| `Teacher.cs`                 | Model representing teacher details.       |
+
+## Frontend (MVC Views)
+
+| Component                   | Description                               |
+|-----------------------------|-------------------------------------------|
+| `TeacherPageController.cs`   | Handles dynamic page routing for teachers. |
+| `List.cshtml`                | Displays a list of all teachers.          |
+| `Show.cshtml`                | Displays details of a specific teacher.   |
+
+
 ## 💻 How to Use This Repository
 1. **Clone the Repository**  
    ```bash
