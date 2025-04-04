@@ -1,0 +1,40 @@
+﻿@model Cumulative1.Models.Student
+@{
+    ViewBag.Title = "Student Details";
+}
+
+<div class="container">
+    <nav class="my-3">
+        <a href="/StudentPage/List" class="btn btn-secondary">Back to Students</a>
+    </nav>
+
+    @if (Model == null)
+    {
+        <div class="alert alert-danger">
+            Student information could not be loaded.
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">@Model.StudentFname @Model.StudentLname</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Student ID:</strong> @Model.StudentId
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Student Number:</strong> @Model.StudentNumber
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Enrollment Date:</strong> @Model.EnrolDate.ToString("yyyy-MM-dd")
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -3,42 +3,63 @@
     ViewBag.Title = "Show";
 }
 
-<div id="containershow" class="container">
-    <nav class="my-3">
-        <a class="navlink" href="/TeacherPage/List">Back To Teachers</a>
+<div id="containershow" class="container mt-4">
+    <nav class="mb-3">
+        <a href="/TeacherPage/List" class="btn btn-outline-secondary">Back To Teachers</a>
     </nav>
-    <h2>Teacher Information</h2>
 
-    <div class="mb-3">
-        <strong>ID:</strong> @Model.TeacherId
-    </div>
-    <div class="mb-3">
-        <strong>Employee Number:</strong> @Model.EmployeeNumber
-    </div>
-    <div class="mb-3">
-        <strong>Salary:</strong> @Model.Salary
-    </div>
+    @if (Model == null)
+    {
+        <div class="alert alert-danger">
+            <h2>Error</h2>
+            <p>No teacher information could be found.</p>
+        </div>
+    }
+    else
+    {
+        <h2>Teacher Information</h2>
 
-    <div class="mb-3">
-        <strong>Full Name:</strong> @Model.TeacherFname @Model.TeacherLname
-    </div>
-    <div class="mb-3">
-        <strong>Hire Date:</strong> @Model.HireDate
-    </div>
-    <div class="mb-3">
-        <strong>Courses:</strong>
-        @if (Model.Courses != null && Model.Courses.Any())
-        {
-            foreach (var _class in Model.Courses)
-            {
-                <div><a href="/Course/Show/@_class.CourseId">@_class.CourseCode</a> : @_class.CourseName</div>
-            }
-        }
-        else
-        {
-            <div>No Courses assigned</div>
-        }
-    </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">@Model.TeacherFname @Model.TeacherLname</h3>
 
-   
+                <dl class="row">
+                    <dt class="col-sm-3">ID:</dt>
+                    <dd class="col-sm-9">@Model.TeacherId</dd>
+
+                    <dt class="col-sm-3">Employee Number:</dt>
+                    <dd class="col-sm-9">@Model.EmployeeNumber</dd>
+
+                    <dt class="col-sm-3">Hire Date:</dt>
+                    <dd class="col-sm-9">@Model.HireDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-3">Salary:</dt>
+                    <dd class="col-sm-9">@Model.Salary.ToString("C")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4>Courses</h4>
+            </div>
+            <div class="card-body">
+                @if (Model.Courses != null && Model.Courses.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var course in Model.Courses)
+                        {
+                            <li class="list-group-item">
+                                <strong>@course.CourseCode</strong> - @course.CourseName
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="alert alert-info">No courses assigned to this teacher.</div>
+                }
+            </div>
+        </div>
+    }
 </div>

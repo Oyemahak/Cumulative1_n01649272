@@ -7,7 +7,6 @@ using Cumulative1.Models;
 using System.Diagnostics;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using Mysqlx.Datatypes;
 
 namespace Cumulative1.Controllers
 {
@@ -15,172 +14,159 @@ namespace Cumulative1.Controllers
     {
         private SchoolDbContext School = new SchoolDbContext();
 
-        /// <summary>
-        /// Returns a list of teachers in the system filtered by an optional search key.
-        /// </summary>
-        /// <param name="SearchKey">Optional search key to filter teachers by first name, last name, full name, hire date, or salary.</param>
-        /// <returns>
-        /// A list of teacher objects.
-        /// Each teacher object contains the following properties:
-        /// - TeacherId (int): The unique identifier of the teacher.
-        /// - TeacherFname (string): The first name of the teacher.
-        /// - TeacherLname (string): The last name of the teacher.
-        /// - EmployeeNumber (string): The employee number of the teacher.
-        /// - HireDate (DateTime): The date when the teacher was hired.
-        /// - Salary (decimal): The salary of the teacher.
-        /// </returns>
-        /// <example>
-        /// Example of GET request:
-        /// GET api/TeacherPage/ListTeachers?SearchKey=Mahak
-        /// GET api/TeacherPage/ListTeachers?SearchKey=06-05
-        /// GET api/TeacherPage/ListTeachers?SearchKey=66
-        /// </example>
         [HttpGet]
         [Route("api/TeacherPage/ListTeachers/{SearchKey?}")]
-        public IEnumerable<Teacher> ListTeachers(string SearchKey = null)
+        public IEnumerable<Teacher> ListTeachers(string SearchKey = null, DateTime? MinHireDate = null, DateTime? MaxHireDate = null)
         {
-            // Create a connection to the database
             MySqlConnection Conn = School.AccessDatabase();
             Conn.Open();
 
-            // Prepare SQL query with optional search key
             MySqlCommand cmd = Conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM Teachers WHERE LOWER(teacherfname) LIKE LOWER(@Key) OR LOWER(teacherlname) LIKE LOWER(@Key) OR LOWER(CONCAT(teacherfname, ' ', teacherlname)) LIKE LOWER(@Key) or hiredate Like @Key or DATE_FORMAT(hiredate, '%d-%m-%Y') Like @Key or salary LIKE @Key ";
-            cmd.Parameters.AddWithValue("@Key", "%" + SearchKey + "%");
+            string query = "SELECT * FROM Teachers";
+            bool hasWhere = false;
 
-            cmd.Prepare();
-
-            // Execute the query
-            MySqlDataReader ResultSet = cmd.ExecuteReader();
-
-            // Create a list to hold teacher objects
-            List<Teacher> Teachers = new List<Teacher>();
-
-            // Loop through each row in the result set
-            while (ResultSet.Read())
+            // Build WHERE clause if any conditions exist
+            if (!string.IsNullOrEmpty(SearchKey) || MinHireDate.HasValue || MaxHireDate.HasValue)
             {
-                // Retrieve column information
-                int TeacherId = Convert.ToInt32(ResultSet["teacherId"]);
-                string TeacherFname = ResultSet["teacherFname"].ToString();
-                string TeacherLname = ResultSet["teacherLname"].ToString();
-                string EmployeeNumber = ResultSet["employeenumber"].ToString();
-                DateTime HireDate = Convert.ToDateTime(ResultSet["hiredate"]);
-                decimal Salary = Convert.ToDecimal(ResultSet["salary"]);
-
-                // Create a new Teacher object and populate its properties
-                Teacher NewTeacher = new Teacher
-                {
-                    TeacherId = TeacherId,
-                    TeacherFname = TeacherFname,
-                    TeacherLname = TeacherLname,
-                    EmployeeNumber = EmployeeNumber,
-                    HireDate = HireDate,
-                    Salary = Salary
-                };
-
-                // Add the teacher to the list
-                Teachers.Add(NewTeacher);
+                query += " WHERE ";
+                hasWhere = true;
             }
 
-            // Close the database connection
-            Conn.Close();
+            // Add search key condition
+            if (!string.IsNullOrEmpty(SearchKey))
+            {
+                query += "(LOWER(teacherfname) LIKE LOWER(@Key) OR " +
+                         "LOWER(teacherlname) LIKE LOWER(@Key) OR " +
+                         "LOWER(CONCAT(teacherfname, ' ', teacherlname)) LIKE LOWER(@Key) OR " +
+                         "hiredate LIKE @Key OR " +
+                         "DATE_FORMAT(hiredate, '%d-%m-%Y') LIKE @Key OR " +
+                         "salary LIKE @Key)";
+                cmd.Parameters.AddWithValue("@Key", "%" + SearchKey + "%");
+            }
 
-            // Return the list of teachers
+            // Add date range conditions
+            if (MinHireDate.HasValue)
+            {
+                if (hasWhere && !string.IsNullOrEmpty(SearchKey))
+                    query += " AND ";
+                query += "hiredate >= @MinHireDate";
+                cmd.Parameters.AddWithValue("@MinHireDate", MinHireDate.Value);
+                hasWhere = true;
+            }
+
+            if (MaxHireDate.HasValue)
+            {
+                if (hasWhere && (!string.IsNullOrEmpty(SearchKey) || MinHireDate.HasValue))
+                    query += " AND ";
+                query += "hiredate <= @MaxHireDate";
+                cmd.Parameters.AddWithValue("@MaxHireDate", MaxHireDate.Value);
+            }
+
+            cmd.CommandText = query;
+            cmd.Prepare();
+
+            MySqlDataReader ResultSet = cmd.ExecuteReader();
+            List<Teacher> Teachers = new List<Teacher>();
+
+            while (ResultSet.Read())
+            {
+                Teachers.Add(new Teacher
+                {
+                    TeacherId = Convert.ToInt32(ResultSet["teacherId"]),
+                    TeacherFname = ResultSet["teacherFname"].ToString(),
+                    TeacherLname = ResultSet["teacherLname"].ToString(),
+                    EmployeeNumber = ResultSet["employeenumber"].ToString(),
+                    HireDate = Convert.ToDateTime(ResultSet["hiredate"]),
+                    Salary = Convert.ToDecimal(ResultSet["salary"])
+                });
+            }
+
+            Conn.Close();
             return Teachers;
         }
 
-        /// <summary>
-        /// Finds a teacher in the system given an ID and retrieves associated classes.
-        /// </summary>
-        /// <param name="id">The teacher's primary key.</param>
-        /// <returns>
-        /// A teacher object with associated classes.
-        /// The teacher object contains the following properties:
-        /// - TeacherId (int): The unique identifier of the teacher.
-        /// - TeacherFname (string): The first name of the teacher.
-        /// - TeacherLname (string): The last name of the teacher.
-        /// - EmployeeNumber (string): The employee number of the teacher.
-        /// - HireDate (DateTime): The date when the teacher was hired.
-        /// - Salary (decimal): The salary of the teacher.
-        /// - Courses (List<Class>): A list of class objects associated with the teacher.
-        /// </returns>
-        /// <example>
-        /// Example of GET request:
-        /// GET api/TeacherPage/FindTeacher/12
-        /// </example>
         [HttpGet]
         [Route("api/TeacherPage/FindTeacher/{id}")]
-        public Teacher FindTeacher(int id)
+        public IHttpActionResult FindTeacher(int id)
         {
-            // Create a new Teacher object
-            Teacher NewTeacher = new Teacher();
+            if (id <= 0)
+                return BadRequest("Teacher ID must be a positive integer");
 
-            // Create a connection to the database
-            MySqlConnection Conn = School.AccessDatabase();
-            Conn.Open();
-
-            // Prepare SQL query to retrieve teacher information
-            MySqlCommand cmd = Conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM Teachers WHERE teacherid = @id";
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.Prepare();
-
-            // Execute the query
-            MySqlDataReader ResultSet = cmd.ExecuteReader();
-
-            // Populate the teacher object with information from the result set
-            while (ResultSet.Read())
+            using (MySqlConnection Conn = School.AccessDatabase())
             {
-                NewTeacher.TeacherId = Convert.ToInt32(ResultSet["teacherId"]);
-                NewTeacher.TeacherFname = ResultSet["teacherFname"].ToString();
-                NewTeacher.TeacherLname = ResultSet["teacherLname"].ToString();
-                NewTeacher.EmployeeNumber = ResultSet["employeenumber"].ToString();
-                NewTeacher.HireDate = Convert.ToDateTime(ResultSet["hiredate"]);
-                NewTeacher.Salary = Convert.ToDecimal(ResultSet["salary"]);
-            }
-            ResultSet.Close(); // Close the result set
-
-            // Prepare SQL query to retrieve classes associated with the teacher
-            MySqlCommand courseCmd = Conn.CreateCommand();
-            courseCmd.CommandText = "SELECT * FROM Courses WHERE teacherid = @id";
-            courseCmd.Parameters.AddWithValue("@id", id);
-            courseCmd.Prepare();
-
-            // Execute the query
-            MySqlDataReader CourseResultSet = courseCmd.ExecuteReader();
-
-            // Create a list to hold course objects
-            List<Course> Courses = new List<Course>();
-
-            // Loop through each row in the course result set
-            while (CourseResultSet.Read())
-            {
-                // Retrieve column information
-                int CourseId = Convert.ToInt32(CourseResultSet["CourseId"]);
-                string CourseCode = CourseResultSet["CourseCode"].ToString();
-                string CourseName = CourseResultSet["CourseName"].ToString();
-
-                // Create a new Course object and populate its properties
-                //note: Id needed for a link to course page. 
-                Course NewCourse = new Course
+                Conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM Teachers WHERE teacherid = @id", Conn))
                 {
-                    CourseId = CourseId,
-                    CourseCode = CourseCode,
-                    CourseName = CourseName
-                };
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Prepare();
 
-                // Add the course to the list
-                Courses.Add(NewCourse);
+                    using (MySqlDataReader ResultSet = cmd.ExecuteReader())
+                    {
+                        if (!ResultSet.HasRows)
+                            return NotFound();
+
+                        ResultSet.Read();
+                        return Ok(new Teacher
+                        {
+                            TeacherId = Convert.ToInt32(ResultSet["teacherId"]),
+                            TeacherFname = ResultSet["teacherFname"].ToString(),
+                            TeacherLname = ResultSet["teacherLname"].ToString(),
+                            EmployeeNumber = ResultSet["employeenumber"].ToString(),
+                            HireDate = Convert.ToDateTime(ResultSet["hiredate"]),
+                            Salary = Convert.ToDecimal(ResultSet["salary"])
+                        });
+                    }
+                }
             }
+        }
 
-            // Add the list of coursees to the teacher object
-            NewTeacher.Courses = Courses;
+        [HttpGet]
+        [Route("api/TeacherPage/GetTeacherCourses/{teacherId}")]
+        public IHttpActionResult GetTeacherCourses(int teacherId)
+        {
+            if (teacherId <= 0)
+                return BadRequest("Teacher ID must be a positive integer");
 
-            // Close the database connection
-            Conn.Close();
+            using (MySqlConnection Conn = School.AccessDatabase())
+            {
+                Conn.Open();
 
-            // Return the teacher object
-            return NewTeacher;
+                // Verify teacher exists
+                using (MySqlCommand teacherCmd = new MySqlCommand("SELECT 1 FROM Teachers WHERE teacherid = @id", Conn))
+                {
+                    teacherCmd.Parameters.AddWithValue("@id", teacherId);
+                    teacherCmd.Prepare();
+
+                    using (MySqlDataReader teacherResult = teacherCmd.ExecuteReader())
+                    {
+                        if (!teacherResult.HasRows)
+                            return NotFound();
+                    }
+                }
+
+                // Get courses
+                List<Course> Courses = new List<Course>();
+                using (MySqlCommand courseCmd = new MySqlCommand("SELECT * FROM Courses WHERE teacherid = @id", Conn))
+                {
+                    courseCmd.Parameters.AddWithValue("@id", teacherId);
+                    courseCmd.Prepare();
+
+                    using (MySqlDataReader CourseResultSet = courseCmd.ExecuteReader())
+                    {
+                        while (CourseResultSet.Read())
+                        {
+                            Courses.Add(new Course
+                            {
+                                CourseId = Convert.ToInt32(CourseResultSet["CourseId"]),
+                                CourseCode = CourseResultSet["CourseCode"].ToString(),
+                                CourseName = CourseResultSet["CourseName"].ToString()
+                            });
+                        }
+                    }
+                }
+
+                return Ok(Courses);
+            }
         }
     }
 }
