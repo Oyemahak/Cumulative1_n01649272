@@ -4,29 +4,38 @@
 }
 
 <div id="containerlist">
-    <h2>List of Teachers</h2>
-
+    <style>
+        .badge {
+            font-size: 0.7em;
+            vertical-align: middle;
+        }
+    </style>
+    <h2>List of Teachers <span class="badge bg-primary">@Model.Count()</span></h2>
+    <div class="mb-3">
+        <a href="/TeacherPage/New" class="btn btn-success">Add New Teacher</a>
+    </div>
     <!-- Search Form with Date Range -->
-    <form action="/TeacherPage/List" method="GET" class="form-inline mb-4">
-        <div class="form-group mr-2">
-            <label for="SearchKey">Search:</label>
-            <input type="text" name="SearchKey" id="SearchKey" autocomplete="off"
-                   value="@Request.QueryString["SearchKey"]" class="form-control" />
+    <form action="/TeacherPage/List" method="GET" class="row g-3 align-items-end mb-4">
+        <div class="col-md-3 col-6">
+            <label for="SearchKey" class="form-label">Search:</label>
+            <input type="text" name="SearchKey" class="form-control">
         </div>
 
-        <div class="form-group mr-2">
-            <label for="MinHireDate">Hired After:</label>
-            <input type="date" name="MinHireDate" id="MinHireDate" class="form-control"
-                   value="@Request.QueryString["MinHireDate"]" />
+        <div class="col-md-3 col-6">
+            <label for="MinHireDate" class="form-label">Hired After:</label>
+            <input type="date" name="MinHireDate" class="form-control">
         </div>
 
-        <div class="form-group mr-2">
-            <label for="MaxHireDate">Hired Before:</label>
-            <input type="date" name="MaxHireDate" id="MaxHireDate" class="form-control"
-                   value="@Request.QueryString["MaxHireDate"]" />
+        <div class="col-md-3 col-6">
+            <label for="MaxHireDate" class="form-label">Hired Before:</label>
+            <input type="date" name="MaxHireDate" class="form-control">
         </div>
 
-        <button type="submit" class="btn btn-primary">Search</button>
+        <div class="col-md-3 col-6 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-search"></i> Search
+            </button>
+        </div>
     </form>
 
     <!-- Teacher Table -->
@@ -50,7 +59,10 @@
                         <td>@teacher.TeacherFname @teacher.TeacherLname</td>
                         <td>@teacher.HireDate.ToString("yyyy-MM-dd")</td>
                         <td>@teacher.Salary.ToString("C")</td>
-                        <td><a href="/TeacherPage/Show/@teacher.TeacherId" class="btn btn-info btn-sm">Details</a></td>
+                        <td>
+                            <a href="/TeacherPage/Show/@teacher.TeacherId" class="btn btn-info btn-sm">Details</a>
+                            <a href="/TeacherPage/DeleteConfirm/@teacher.TeacherId" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
                     </tr>
                 }
             </tbody>

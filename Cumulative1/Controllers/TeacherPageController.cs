@@ -91,5 +91,28 @@ namespace Cumulative1.Controllers
 
             return View(teacher);
         }
+
+        // ============== NEW METHODS FOR PART 2 ==============
+        public ActionResult New()
+        {
+            return View();
+        }
+
+        public ActionResult DeleteConfirm(int id)
+        {
+            TeacherAPIController api = new TeacherAPIController();
+            var result = api.FindTeacher(id);
+
+            if (result is System.Web.Http.Results.NotFoundResult)
+            {
+                return View("Error", new HandleErrorInfo(
+                    new Exception($"Teacher with ID {id} not found"),
+                    "TeacherPage",
+                    "DeleteConfirm"));
+            }
+
+            var contentResult = result as System.Web.Http.Results.OkNegotiatedContentResult<Teacher>;
+            return View(contentResult.Content);
+        }
     }
 }

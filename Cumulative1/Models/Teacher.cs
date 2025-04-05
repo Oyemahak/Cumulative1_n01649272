@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Cumulative1.Models
 {
-    /// <summary>
-    /// Represents a teacher in the school system
-    /// </summary>
+    [DataContract]
     public class Teacher
     {
-        // The unique identifier for the teacher
+        [DataMember]
         public int TeacherId { get; set; }
 
-        // The first name of the teacher
+        [DataMember]
         public string TeacherFname { get; set; }
 
-        // The last name of the teacher
+        [DataMember]
         public string TeacherLname { get; set; }
 
-        // The employee number (format: T followed by digits)
+        [DataMember]
         public string EmployeeNumber { get; set; }
 
-        // The date when the teacher was hired
+        [DataMember]
         public DateTime HireDate { get; set; }
 
-        // The teacher's salary
+        [DataMember]
         public decimal Salary { get; set; }
 
-        // List of courses taught by this teacher
+        [DataMember]
         public List<Course> Courses { get; set; } = new List<Course>();
     }
 }

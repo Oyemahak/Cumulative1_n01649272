@@ -1,36 +1,86 @@
-﻿@{
-    ViewBag.Title = "New";
+﻿@model Cumulative1.Models.Teacher
+@{
+    ViewBag.Title = "New Teacher";
 }
+<nav class="mb-3">
+    <a href="/TeacherPage/List" class="btn btn-outline-secondary">Back to Teachers</a>
+</nav>
 
-<div id="containernew" class="container">
-    <nav class="my-3">
-        <a class="navlink" href="/TeacherPage/List">Back To Teachers</a>
-    </nav>
-    <h2>Add New Teacher</h2>
+<h2>Add New Teacher</h2>
 
-    <form method="POST" action="/TeacherPage/Create">
-        <div class="mb-3">
-            <label for="TeacherFname" class="form-label">First Name:</label>
-            <input type="text" id="TeacherFname" name="TeacherFname" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label for="TeacherLname" class="form-label">Last Name:</label>
-            <input type="text" id="TeacherLname" name="TeacherLname" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label for="EmployeeNumber" class="form-label">Employee Number:</label>
-            <input type="text" id="EmployeeNumber" name="EmployeeNumber" class="form-control" placeholder="T123" required />
-        </div>
-        <div class="mb-3">
-            <label for="HireDate" class="form-label">Hire Date:</label>
-            <input type="date" id="HireDate" name="HireDate" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label for="Salary" class="form-label">Salary:</label>
-            <input type="number" step="0.01" id="Salary" name="Salary" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <input type="submit" value="Add Teacher" class="btn btn-primary" />
-        </div>
-    </form>
-</div>
+<form id="addTeacherForm" class="needs-validation" novalidate>
+    <!-- Field Group 1 -->
+    <div class="mb-3">
+        <label for="TeacherFname" class="form-label">First Name*</label>
+        <input type="text" id="TeacherFname" class="form-control" required>
+    </div>
+
+    <!-- Field Group 2 -->
+    <div class="mb-3">
+        <label for="TeacherLname" class="form-label">Last Name*</label>
+        <input type="text" id="TeacherLname" class="form-control" required>
+    </div>
+
+    <!-- Field Group 3 -->
+    <div class="mb-3">
+        <label for="EmployeeNumber" class="form-label">Employee Number*</label>
+        <input type="text" id="EmployeeNumber" class="form-control" required>
+    </div>
+
+    <!-- Field Group 4 -->
+    <div class="mb-3">
+        <label for="HireDate" class="form-label">Hire Date*</label>
+        <input type="date" id="HireDate" class="form-control" required>
+    </div>
+
+    <!-- Field Group 5 -->
+    <div class="mb-3">
+        <label for="Salary" class="form-label">Salary*</label>
+        <input type="number" step="0.01" id="Salary" class="form-control" required>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary me-2">Save</button>
+        <a href="/TeacherPage/List" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+<div id="resultMessage" class="mt-3"></div>
+
+@section Scripts {
+    <script>
+        $("#addTeacherForm").submit(function (e) {
+            e.preventDefault();
+
+            var formData = {
+                TeacherFname: $("#TeacherFname").val(),
+                TeacherLname: $("#TeacherLname").val(),
+                EmployeeNumber: $("#EmployeeNumber").val(),
+                HireDate: $("#HireDate").val(),
+                Salary: parseFloat($("#Salary").val())
+            };
+
+            $.ajax({
+                url: "/api/TeacherPage/AddTeacher",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function (data) {
+                    $("#resultMessage").html(`
+                            <div class="alert alert-success">
+                                Teacher added successfully! ID: ${data.TeacherId}
+                            </div>
+                        `);
+                    $("#addTeacherForm")[0].reset();
+                },
+                error: function (xhr) {
+                    $("#resultMessage").html(`
+                            <div class="alert alert-danger">
+                                Error: ${xhr.responseText}
+                            </div>
+                        `);
+                }
+            });
+        });
+    </script>
+}

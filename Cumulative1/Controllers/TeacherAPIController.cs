@@ -168,5 +168,108 @@ namespace Cumulative1.Controllers
                 return Ok(Courses);
             }
         }
+
+        // Add these new methods to your existing TeacherAPIController.cs
+
+        /// <summary>
+        /// Adds a new teacher to the system
+        /// </summary>
+        [HttpPost]
+        [Route("api/TeacherPage/AddTeacher")]
+        public IHttpActionResult AddTeacher([FromBody] Teacher newTeacher)
+        {
+            // =================================================================
+            // VALIDATION 1: Ensure Employee Number follows format "T" + digits
+            // - Uses regex pattern ^T\d+$:
+            //   - ^T     : Must start with "T"
+            //   - \d+    : Followed by one or more digits
+            //   - $      : No extra characters allowed
+            // - Returns 400 Bad Request if format is invalid
+            // =================================================================
+
+            if (string.IsNullOrWhiteSpace(newTeacher.EmployeeNumber) ||
+                string.IsNullOrWhiteSpace(newTeacher.EmployeeNumber) ||
+                !System.Text.RegularExpressions.Regex.IsMatch(newTeacher.EmployeeNumber, @"^T\d+$"))
+            {
+                return BadRequest("Employee number cannot be empty");
+            }
+
+            // =================================================================
+            // VALIDATION 2: Teacher name cannot be empty
+            // =================================================================
+
+            if (string.IsNullOrWhiteSpace(newTeacher.TeacherFname) ||
+                string.IsNullOrWhiteSpace(newTeacher.TeacherLname))
+            {
+                return BadRequest("Teacher first and last name cannot be empty");
+            }
+
+            // =================================================================
+            // VALIDATION 3: Hire date cannot be in the future
+            // =================================================================
+
+            if (newTeacher.HireDate > DateTime.Today)
+            {
+                return BadRequest("Hire date cannot be in the future");
+            }
+
+            using (MySqlConnection Conn = School.AccessDatabase())
+            {
+                Conn.Open();
+                MySqlCommand cmd = new MySqlCommand(
+                    "INSERT INTO teachers (teacherfname, teacherlname, employeenumber, hiredate, salary) " +
+                    "VALUES (@fname, @lname, @empnum, @hiredate, @salary);", Conn);
+
+                cmd.Parameters.AddWithValue("@fname", newTeacher.TeacherFname);
+                cmd.Parameters.AddWithValue("@lname", newTeacher.TeacherLname);
+                cmd.Parameters.AddWithValue("@empnum", newTeacher.EmployeeNumber);
+                cmd.Parameters.AddWithValue("@hiredate", newTeacher.HireDate);
+                cmd.Parameters.AddWithValue("@salary", newTeacher.Salary);
+
+                cmd.Prepare();
+                cmd.ExecuteNonQuery();
+
+                // Get the ID of the newly inserted teacher
+                cmd.CommandText = "SELECT LAST_INSERT_ID()";
+                newTeacher.TeacherId = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+
+            return Ok("Teacher Added Successfully!");
+        }
+
+        /// <summary>
+        /// Deletes a teacher from the system
+        /// </summary>
+        [HttpDelete]
+        [Route("api/TeacherPage/DeleteTeacher/{id}")]
+        public IHttpActionResult DeleteTeacher(int id)
+        {
+            // Initiative #1: Validate ID
+            if (id <= 0) return BadRequest("Invalid Teacher ID");
+
+            using (MySqlConnection Conn = School.AccessDatabase())
+            {
+                Conn.Open();
+
+                // Check if teacher exists first
+                MySqlCommand checkCmd = new MySqlCommand(
+                    "SELECT teacherid FROM teachers WHERE teacherid = @id", Conn);
+                checkCmd.Parameters.AddWithValue("@id", id);
+
+                if (checkCmd.ExecuteScalar() == null)
+                {
+                    return NotFound();
+                }
+
+                // Delete the teacher
+                MySqlCommand deleteCmd = new MySqlCommand(
+                    "DELETE FROM teachers WHERE teacherid = @id", Conn);
+                deleteCmd.Parameters.AddWithValue("@id", id);
+                deleteCmd.Prepare();
+                deleteCmd.ExecuteNonQuery();
+            }
+
+            return Ok($"Teacher {id} deleted successfully");
+        }
     }
 }
