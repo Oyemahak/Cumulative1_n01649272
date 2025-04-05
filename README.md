@@ -1,4 +1,4 @@
-# Cumulative1_n01649272
+# Cumulative_n01649272
 
 ## 📌 Project Overview
 This repository contains structured data for courses and instructors, representing an academic system. The dataset includes details about courses, their instructors, and relevant timelines. The purpose of this repository is to organize and present the information in a structured format for analysis and development.
