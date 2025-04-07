@@ -1,26 +1,92 @@
-﻿<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="aspnetTitle">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-            a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-            is an ideal platform for building RESTful applications on the .NET Framework.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-        </section>>
+﻿@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="jumbotron jumbotron-fluid mt-4 mb-5">
+    <div class="container">
+        <h1 class="display-4">School Management Database</h1>
+        <p class="lead">Manage faculty records, course assignments, and academic data</p>
+        <hr class="my-4">
+        <div class="d-flex flex-wrap gap-3">
+            <a href="/TeacherPage/List" class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-chalkboard-teacher mr-2"></i> View Teachers
+            </a>
+            <a href="/TeacherPage/New" class="btn btn-success btn-lg px-4">
+                <i class="fas fa-plus mr-2"></i> Add New Teacher
+            </a>
+        </div>
     </div>
-</main>
+</div>
+
+<div class="container mb-5">
+    <div class="row gy-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </h5>
+                    <hr>
+                    <p class="card-text">
+                        Comprehensive system for managing school faculty records and
+                        course assignments with secure data access.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <i class="fas fa-tasks mr-2"></i>Features
+                    </h5>
+                    <hr>
+                    <ul class="pl-3">
+                        <li class="mb-2">Teacher CRUD operations</li>
+                        <li class="mb-2">Course management</li>
+                        <li class="mb-2">Advanced search and filtering</li>
+                        <li>Data validation and security</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <i class="fas fa-book mr-2"></i>Documentation
+                    </h5>
+                    <hr>
+                    <p class="card-text mb-4">
+                        Access API documentation for system integration and development.
+                    </p>
+                    <a href="/Help" class="btn btn-outline-primary">
+                        <i class="fas fa-book-open mr-2"></i>API Docs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .jumbotron {
+        background-color: #f8f9fa;
+        border-radius: 0.3rem;
+        padding: 3rem 2rem;
+    }
+
+    .card {
+        transition: transform 0.2s;
+        border: none;
+        border-radius: 0.5rem;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    hr {
+        border-top: 1px solid rgba(0,0,0,0.1);
+    }
+</style>
