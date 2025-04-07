@@ -1,10 +1,10 @@
-# Cumulative1_n01649272
+# Cumulative_n01649272
 
 ## 📌 Project Overview
 This repository contains structured data for courses and instructors, representing an academic system. The dataset includes details about courses, their instructors, and relevant timelines. The purpose of this repository is to organize and present the information in a structured format for analysis and development.
 
 ## 📂 Repository Information
-- **GitHub Repository:** [Cumulative1_n01649272](https://github.com/Oyemahak/Cumulative1_n01649272)  
+- **GitHub Repository:** [Cumulative1_n01649272](https://github.com/Oyemahak/Cumulative_n01649272)  
 - **Author:** Mahak Patel  
 - **Database Structure:** Includes course details and teacher information  
 
@@ -50,27 +50,56 @@ The following table provides details about instructors, including their employee
 
 ## 📂 Project Structure
 
-## Backend (Web API)
-
+### Part 1: Read Functionality (Completed)
+#### Backend (Web API)
 | Component                   | Description                               |
 |-----------------------------|-------------------------------------------|
 | `SchoolDbContext.cs`         | Database context for MySQL connection.    |
 | `TeacherAPIController.cs`    | API Controller for retrieving teacher data. |
 | `Teacher.cs`                 | Model representing teacher details.       |
 
-## Frontend (MVC Views)
-
+#### Frontend (MVC Views)
 | Component                   | Description                               |
 |-----------------------------|-------------------------------------------|
 | `TeacherPageController.cs`   | Handles dynamic page routing for teachers. |
 | `List.cshtml`                | Displays a list of all teachers.          |
 | `Show.cshtml`                | Displays details of a specific teacher.   |
 
+### Part 2: Add/Delete Functionality (New)
+#### Backend (Web API)
+| Component                   | Description                               |
+|-----------------------------|-------------------------------------------|
+| `TeacherAPIController.cs`    | Added methods for adding/deleting teachers |
+| `Teacher.cs`                 | Updated with property accessors           |
+
+#### Frontend (MVC Views)
+| Component                   | Description                               |
+|-----------------------------|-------------------------------------------|
+| `TeacherPageController.cs`   | Added methods for create/delete actions   |
+| `New.cshtml`                | Form for adding new teachers              |
+| `DeleteConfirm.cshtml`      | Confirmation page for deleting teachers   |
+| `List.cshtml`               | Updated with add/delete links             |
+
+---
+
+## 🚀 Key Features Added in Part 2
+1. **Teacher Management**
+   - Add new teachers to the system
+   - Delete existing teachers with confirmation
+   - Form validation for new teacher entries
+
+2. **API Endpoints**
+   - `POST /api/TeacherPage/AddTeacher` - Creates a new teacher
+   - `POST /api/TeacherPage/DeleteTeacher/{id}` - Removes a teacher
+
+3. **User Interface**
+   - Intuitive forms for data entry
+   - Clear confirmation dialogs for destructive actions
+   - Seamless navigation between views
+
+---
 
 ## 💻 How to Use This Repository
 1. **Clone the Repository**  
    ```bash
-   git clone https://github.com/Oyemahak/Cumulative1_n01649272.git
-
-## Author
-**Mahak Patel** - Developed as part of **Christine Bittle’s C# Cumulative Project** at Humber College.
+   git clone https://github.com/Oyemahak/Cumulative_n01649272.git
