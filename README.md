@@ -4,7 +4,7 @@
 This repository contains structured data for courses and instructors, representing an academic system. The dataset includes details about courses, their instructors, and relevant timelines. The purpose of this repository is to organize and present the information in a structured format for analysis and development.
 
 ## 📂 Repository Information
-- **GitHub Repository:** [Cumulative1_n01649272](https://github.com/Oyemahak/Cumulative_n01649272)  
+- **GitHub Repository:** [Cumulative_n01649272](https://github.com/Oyemahak/Cumulative_n01649272)  
 - **Author:** Mahak Patel  
 - **Database Structure:** Includes course details and teacher information  
 
