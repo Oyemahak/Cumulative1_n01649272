@@ -1,105 +1,130 @@
 # Cumulative_n01649272
 
 ## 📌 Project Overview
-This repository contains structured data for courses and instructors, representing an academic system. The dataset includes details about courses, their instructors, and relevant timelines. The purpose of this repository is to organize and present the information in a structured format for analysis and development.
+This ASP.NET Core MVC/WebAPI project provides full CRUD functionality for Teachers and Students in a school database system. The application includes comprehensive error handling, validation, and initiative features across all three parts of the cumulative project.
 
 ## 📂 Repository Information
 - **GitHub Repository:** [Cumulative_n01649272](https://github.com/Oyemahak/Cumulative_n01649272)  
 - **Author:** Mahak Patel  
-- **Database Structure:** Includes course details and teacher information  
+- **Database:** MySQL School Database with Teachers, Students, and Courses tables  
 
 ---
 
-## 📚 Course Data
-The following table provides details about the available courses, including their duration and assigned instructors.
+## 🚀 Project Features
 
-| Course ID | Course Code | Teacher ID | Start Date  | End Date    | Course Name                         |
-|-----------|------------|------------|------------|------------|-------------------------------------|
-| 1         | HTTP5101   | 1          | 2018-09-04 | 2018-12-14 | Web Application Development        |
-| 2         | HTTP5102   | 2          | 2018-09-04 | 2018-12-14 | Project Management                 |
-| 3         | HTTP5103   | 5          | 2018-09-04 | 2018-12-14 | Web Programming                    |
-| 4         | HTTP5104   | 7          | 2018-09-04 | 2018-12-14 | Digital Design                     |
-| 5         | HTTP5105   | 8          | 2018-09-04 | 2018-12-14 | Database Development               |
-| 6         | HTTP5201   | 2          | 2019-01-08 | 2019-04-27 | Security & Quality Assurance       |
-| 7         | HTTP5202   | 3          | 2019-01-08 | 2019-04-27 | Web Application Development 2      |
-| 8         | HTTP5203   | 4          | 2019-01-08 | 2019-04-27 | XML and Web Services               |
-| 9         | HTTP5204   | 5          | 2019-01-08 | 2019-04-27 | Mobile Development                 |
-| 10        | HTTP5205   | 6          | 2019-01-08 | 2019-04-27 | Career Connections                 |
-| 11        | HTTP5206   | 8          | 2019-01-08 | 2019-04-27 | Web Information Architecture       |
-| 12        | PHYS2203   | 10         | 2019-09-04 | 2019-12-14 | Massage Therapy                    |
+### Part 1: Read Functionality (Completed)
+#### Teacher Features
+- List all teachers with search/filter capabilities
+- View detailed teacher information
+- Display courses taught by each teacher
+
+#### Student Features
+- List all students with search functionality
+- View detailed student information
+- Display enrolled courses
+
+### Part 2: Add/Delete Functionality
+#### Teacher Features
+- Add new teachers with validation
+- Delete teachers with confirmation
+- Error handling for invalid inputs
+
+#### Student Features
+- Add new students with validation
+- Delete students with confirmation
+- Comprehensive error handling
+
+### Part 3: Update Functionality (New)
+#### Teacher Features
+- Update teacher information
+- Client and server-side validation
+- Error handling for invalid updates
+
+#### Student Features
+- Update student records
+- Full validation suite
+- AJAX-powered updates
 
 ---
 
-## 👨‍🏫 Teacher Data
-The following table provides details about instructors, including their employee numbers, hire dates, and salaries.
+## 📚 Database Structure
 
+### Teachers Table
 | Teacher ID | First Name | Last Name  | Employee Number | Hire Date  | Salary  |
 |------------|-----------|------------|---------------|------------|--------|
 | 1          | Alexander | Bennett    | T378         | 2016-08-05 | 55.30  |
 | 2          | Caitlin   | Cummings   | T381         | 2014-06-10 | 62.77  |
-| 3          | Linda     | Chan       | T382         | 2015-08-22 | 60.22  |
-| 4          | Lauren    | Smith      | T385         | 2014-06-22 | 74.20  |
-| 5          | Jessica   | Morris     | T389         | 2012-06-04 | 48.62  |
-| 6          | Thomas    | Hawkins    | T393         | 2016-08-10 | 54.45  |
-| 7          | Shannon   | Barton     | T397         | 2013-08-04 | 64.70  |
-| 8          | Dana      | Ford       | T401         | 2014-06-26 | 71.15  |
-| 9          | Cody      | Holland    | T403         | 2016-06-13 | 43.20  |
-| 10         | John      | Taram      | T505         | 2015-10-23 | 79.63  |
+| ...        | ...       | ...        | ...          | ...        | ...    |
+
+### Students Table
+| Student ID | First Name | Last Name | Student Number | Enrollment Date | Balance |
+|------------|-----------|------------|---------------|-----------------|---------|
+| 1          | John      | Smith      | S10001       | 2020-09-01      | 500.00  |
+| 2          | Sarah     | Johnson    | S10002       | 2021-01-05      | 750.00  |
+| ...        | ...       | ...        | ...          | ...             | ...     |
 
 ---
 
 ## 📂 Project Structure
 
-### Part 1: Read Functionality (Completed)
-#### Backend (Web API)
-| Component                   | Description                               |
-|-----------------------------|-------------------------------------------|
-| `SchoolDbContext.cs`         | Database context for MySQL connection.    |
-| `TeacherAPIController.cs`    | API Controller for retrieving teacher data. |
-| `Teacher.cs`                 | Model representing teacher details.       |
+### Shared Components
+| File | Description |
+|------|-------------|
+| `SchoolDbContext.cs` | MySQL database context |
+| `Shared/_Layout.cshtml` | Master layout page |
 
-#### Frontend (MVC Views)
-| Component                   | Description                               |
-|-----------------------------|-------------------------------------------|
-| `TeacherPageController.cs`   | Handles dynamic page routing for teachers. |
-| `List.cshtml`                | Displays a list of all teachers.          |
-| `Show.cshtml`                | Displays details of a specific teacher.   |
+### Teacher Components
+| Component | Type | Description |
+|-----------|------|-------------|
+| `TeacherAPIController.cs` | WebAPI | All CRUD operations |
+| `TeacherPageController.cs` | MVC | Routing and views |
+| `Teacher.cs` | Model | Teacher data structure |
+| `List.cshtml` | View | Teacher listing |
+| `Show.cshtml` | View | Teacher details |
+| `New.cshtml` | View | Add teacher form |
+| `Edit.cshtml` | View | Update teacher form |
+| `DeleteConfirm.cshtml` | View | Delete confirmation |
 
-### Part 2: Add/Delete Functionality (New)
-#### Backend (Web API)
-| Component                   | Description                               |
-|-----------------------------|-------------------------------------------|
-| `TeacherAPIController.cs`    | Added methods for adding/deleting teachers |
-| `Teacher.cs`                 | Updated with property accessors           |
-
-#### Frontend (MVC Views)
-| Component                   | Description                               |
-|-----------------------------|-------------------------------------------|
-| `TeacherPageController.cs`   | Added methods for create/delete actions   |
-| `New.cshtml`                | Form for adding new teachers              |
-| `DeleteConfirm.cshtml`      | Confirmation page for deleting teachers   |
-| `List.cshtml`               | Updated with add/delete links             |
+### Student Components
+| Component | Type | Description |
+|-----------|------|-------------|
+| `StudentAPIController.cs` | WebAPI | All CRUD operations |
+| `StudentPageController.cs` | MVC | Routing and views |
+| `Student.cs` | Model | Student data structure |
+| `List.cshtml` | View | Student listing |
+| `Show.cshtml` | View | Student details |
+| `New.cshtml` | View | Add student form |
+| `Edit.cshtml` | View | Update student form |
+| `DeleteConfirm.cshtml` | View | Delete confirmation |
 
 ---
 
-## 🚀 Key Features Added in Part 2
-1. **Teacher Management**
-   - Add new teachers to the system
-   - Delete existing teachers with confirmation
-   - Form validation for new teacher entries
+## 🛠️ Technical Implementation
 
-2. **API Endpoints**
-   - `POST /api/TeacherPage/AddTeacher` - Creates a new teacher
-   - `POST /api/TeacherPage/DeleteTeacher/{id}` - Removes a teacher
+### Key Features Added in Part 3
+1. **Update Functionality**
+   - Full teacher/student update capabilities
+   - Comprehensive validation (client and server-side)
+   - Error handling for invalid updates
 
-3. **User Interface**
-   - Intuitive forms for data entry
-   - Clear confirmation dialogs for destructive actions
-   - Seamless navigation between views
+2. **Enhanced API Endpoints**
+   - `PUT /api/TeacherPage/UpdateTeacher/{id}`
+   - `PUT /api/StudentPage/UpdateStudent/{id}`
+   - Robust error responses
+
+3. **User Interface Improvements**
+   - Edit forms for teachers and students
+   - Responsive design enhancements
+
+4. **Initiative Features Completed**
+   - Full error handling for all operations
+   - Client-side validation with JavaScript
+   - Cross-feature implementation (Teachers/Students/Courses)
 
 ---
 
 ## 💻 How to Use This Repository
+
 1. **Clone the Repository**  
    ```bash
    git clone https://github.com/Oyemahak/Cumulative_n01649272.git
