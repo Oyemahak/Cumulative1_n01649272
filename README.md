@@ -43,7 +43,6 @@ This ASP.NET Core MVC/WebAPI project provides full CRUD functionality for Teache
 #### Student Features
 - Update student records
 - Full validation suite
-- AJAX-powered updates
 
 ---
 
