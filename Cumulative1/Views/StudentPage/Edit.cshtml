@@ -1,0 +1,99 @@
+﻿@model Cumulative1.Models.Student
+@{
+    ViewBag.Title = "Edit Student";
+}
+
+<div class="container mt-4">
+    <h2>Edit Student</h2>
+
+    <form id="editStudentForm" class="needs-validation" novalidate>
+        <input type="hidden" id="StudentId" value="@Model.StudentId" />
+
+        <div class="mb-3">
+            <label for="StudentFname" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="StudentFname"
+                   value="@Model.StudentFname" required>
+            <div class="invalid-feedback">Please provide a first name.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="StudentLname" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="StudentLname"
+                   value="@Model.StudentLname" required>
+            <div class="invalid-feedback">Please provide a last name.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="StudentNumber" class="form-label">Student Number</label>
+            <input type="text" class="form-control" id="StudentNumber"
+                   value="@Model.StudentNumber" required>
+            <div class="invalid-feedback">Please provide a student number.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="EnrolDate" class="form-label">Enrollment Date</label>
+            <input type="date" class="form-control" id="EnrolDate"
+                   value="@Model.EnrolDate.ToString("yyyy-MM-dd")" required>
+            <div class="invalid-feedback">Please provide an enrollment date.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="/StudentPage/List" class="btn btn-secondary">Cancel</a>
+    </form>
+
+    <div id="resultMessage" class="mt-3"></div>
+</div>
+
+@section Scripts {
+    <script>
+        // Client-side validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        $("#editStudentForm").submit(function (e) {
+            e.preventDefault();
+
+            var formData = {
+                StudentId: $("#StudentId").val(),
+                StudentFname: $("#StudentFname").val(),
+                StudentLname: $("#StudentLname").val(),
+                StudentNumber: $("#StudentNumber").val(),
+                EnrolDate: $("#EnrolDate").val()
+            };
+
+            $.ajax({
+                url: "/api/StudentPage/UpdateStudent/" + formData.StudentId,
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function () {
+                    $("#resultMessage").html(`
+                            <div class="alert alert-success">
+                                Student updated successfully! Redirecting...
+                            </div>
+                        `);
+                    setTimeout(() => window.location.href = "/StudentPage/Show/" + formData.StudentId, 1500);
+                },
+                error: function (xhr) {
+                    $("#resultMessage").html(`
+                            <div class="alert alert-danger">
+                                Error: ${xhr.responseText}
+                            </div>
+                        `);
+                }
+            });
+        });
+    </script>
+}

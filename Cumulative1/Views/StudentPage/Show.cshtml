@@ -3,38 +3,48 @@
     ViewBag.Title = "Student Details";
 }
 
-<div class="container">
-    <nav class="my-3">
-        <a href="/StudentPage/List" class="btn btn-secondary">Back to Students</a>
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/StudentPage/List">Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Details</li>
+        </ol>
     </nav>
 
-    @if (Model == null)
-    {
-        <div class="alert alert-danger">
-            Student information could not be loaded.
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">@Model.StudentFname @Model.StudentLname</h2>
         </div>
-    }
-    else
-    {
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0">@Model.StudentFname @Model.StudentLname</h2>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <strong>Student ID:</strong> @Model.StudentId
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Student Number:</strong> @Model.StudentNumber
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong>Enrollment Date:</strong> @Model.EnrolDate.ToString("yyyy-MM-dd")
-                    </div>
-                </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Student ID:</dt>
+                <dd class="col-sm-9">@Model.StudentId</dd>
+
+                <dt class="col-sm-3">First Name:</dt>
+                <dd class="col-sm-9">@Model.StudentFname</dd>
+
+                <dt class="col-sm-3">Last Name:</dt>
+                <dd class="col-sm-9">@Model.StudentLname</dd>
+
+                <dt class="col-sm-3">Student Number:</dt>
+                <dd class="col-sm-9">@Model.StudentNumber</dd>
+
+                <dt class="col-sm-3">Enrollment Date:</dt>
+                <dd class="col-sm-9">@Model.EnrolDate.ToString("yyyy-MM-dd")</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <div class="btn-group">
+                <a href="/StudentPage/Edit/@Model.StudentId" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="/StudentPage/DeleteConfirm/@Model.StudentId" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+                <a href="/StudentPage/List" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> Back to List
+                </a>
             </div>
         </div>
-    }
+    </div>
 </div>

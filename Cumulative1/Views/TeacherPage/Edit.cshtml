@@ -1,0 +1,203 @@
+﻿@model Cumulative1.Models.Teacher
+@{
+    ViewBag.Title = "Edit Teacher";
+}
+
+<nav class="mb-3">
+    <a href="/TeacherPage/List" class="btn btn-outline-secondary">Back to Teachers</a>
+    <a href="/TeacherPage/Show/@Model.TeacherId" class="btn btn-outline-info ml-2">View Details</a>
+</nav>
+
+<h2>Edit Teacher</h2>
+
+<form id="editTeacherForm" class="needs-validation" novalidate>
+    <input type="hidden" id="TeacherId" value="@Model.TeacherId" />
+
+    <!-- Field Group 1 -->
+    <div class="mb-3">
+        <label for="TeacherFname" class="form-label">First Name*</label>
+        <input type="text" id="TeacherFname" class="form-control" value="@Model.TeacherFname" required>
+        <div class="invalid-feedback">Please provide a first name.</div>
+    </div>
+
+    <!-- Field Group 2 -->
+    <div class="mb-3">
+        <label for="TeacherLname" class="form-label">Last Name*</label>
+        <input type="text" id="TeacherLname" class="form-control" value="@Model.TeacherLname" required>
+        <div class="invalid-feedback">Please provide a last name.</div>
+    </div>
+
+    <!-- Field Group 3 -->
+    <div class="mb-3">
+        <label for="EmployeeNumber" class="form-label">Employee Number*</label>
+        <input type="text" id="EmployeeNumber" class="form-control" value="@Model.EmployeeNumber" required>
+        <div class="invalid-feedback">Please provide a valid employee number (format: T123).</div>
+    </div>
+
+    <!-- Field Group 4 -->
+    <div class="mb-3">
+        <label for="HireDate" class="form-label">Hire Date*</label>
+        <input type="date" id="HireDate" class="form-control"
+               value="@Model.HireDate.ToString("yyyy-MM-dd")" required>
+        <div class="invalid-feedback">Hire date cannot be in the future.</div>
+    </div>
+
+    <!-- Field Group 5 -->
+    <div class="mb-3">
+        <label for="Salary" class="form-label">Salary*</label>
+        <input type="number" step="0.01" id="Salary" class="form-control"
+               value="@Model.Salary.ToString("0.00")" required>
+        <div class="invalid-feedback">Salary must be a positive value.</div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary me-2">Save Changes</button>
+        <a href="/TeacherPage/List" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+<div id="resultMessage" class="mt-3"></div>
+
+@section Scripts {
+    <script>
+        // Client-side validation
+        (function () {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // AJAX form submission
+        $("#editTeacherForm").submit(function (e) {
+            e.preventDefault();
+
+            // Validate hire date is not in the future
+            const hireDate = new Date($("#HireDate").val());
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (hireDate > today) {
+                $("#HireDate").addClass("is-invalid");
+                $("#resultMessage").html(`
+                    <div class="alert alert-danger">
+                        Error: Hire date cannot be in the future
+                    </div>
+                `);
+                return;
+            }
+
+            // Validate salary is positive
+            const salary = parseFloat($("#Salary").val());
+            if (salary <= 0) {
+                $("#Salary").addClass("is-invalid");
+                $("#resultMessage").html(`
+                    <div class="alert alert-danger">
+                        Error: Salary must be positive
+                    </div>
+                `);
+                return;
+            }
+
+            // Validate employee number format
+            const empNumber = $("#EmployeeNumber").val();
+            if (!empNumber.match(/^T\d+$/)) {
+                $("#EmployeeNumber").addClass("is-invalid");
+                $("#resultMessage").html(`
+                    <div class="alert alert-danger">
+                        Error: Employee number must start with 'T' followed by digits
+                    </div>
+                `);
+                return;
+            }
+
+            var formData = {
+                TeacherId: parseInt($("#TeacherId").val()),
+                TeacherFname: $("#TeacherFname").val(),
+                TeacherLname: $("#TeacherLname").val(),
+                EmployeeNumber: empNumber,
+                HireDate: $("#HireDate").val(),
+                Salary: salary
+            };
+
+            $.ajax({
+                url: "/api/TeacherPage/UpdateTeacher/" + formData.TeacherId,
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function (data) {
+                    $("#resultMessage").html(`
+                        <div class="alert alert-success">
+                            Teacher updated successfully!
+                        </div>
+                    `);
+
+                    // Redirect to show page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = "/TeacherPage/Show/" + formData.TeacherId;
+                    }, 2000);
+                },
+                error: function (xhr) {
+                    let errorMessage = "Error updating teacher";
+                    if (xhr.responseJSON && xhr.responseJSON.Message) {
+                        errorMessage = xhr.responseJSON.Message;
+                    } else if (xhr.responseText) {
+                        errorMessage = xhr.responseText;
+                    }
+
+                    $("#resultMessage").html(`
+                        <div class="alert alert-danger">
+                            ${errorMessage}
+                        </div>
+                    `);
+                }
+            });
+        });
+
+        // Real-time validation for employee number
+        $("#EmployeeNumber").on("input", function() {
+            const empNumber = $(this).val();
+            if (empNumber.match(/^T\d*$/)) {
+                $(this).removeClass("is-invalid");
+            } else {
+                $(this).addClass("is-invalid");
+            }
+        });
+
+        // Real-time validation for hire date
+        $("#HireDate").on("change", function() {
+            const hireDate = new Date($(this).val());
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (hireDate > today) {
+                $(this).addClass("is-invalid");
+            } else {
+                $(this).removeClass("is-invalid");
+            }
+        });
+
+        // Real-time validation for salary
+        $("#Salary").on("input", function() {
+            const salary = parseFloat($(this).val());
+            if (salary > 0) {
+                $(this).removeClass("is-invalid");
+            } else {
+                $(this).addClass("is-invalid");
+            }
+        });
+    </script>
+}

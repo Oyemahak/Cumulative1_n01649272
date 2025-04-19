@@ -6,6 +6,7 @@
     <title>@ViewBag.Title - School Management Database</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("Styles", required: false)
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .navbar {
@@ -34,6 +35,9 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">@Html.ActionLink("Home", "Index", "Home", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Teachers", "List", "TeacherPage", null, new { @class = "nav-link" })</li>
+                    <!-- Add this new line for Students -->
+                    <li class="nav-item">@Html.ActionLink("Students", "List", "StudentPage", null, new { @class = "nav-link" })</li>
+                    <!-- End new line -->
                     <li class="nav-item">@Html.ActionLink("API Docs", "Index", "Help", null, new { @class = "nav-link" })</li>
                 </ul>
             </div>

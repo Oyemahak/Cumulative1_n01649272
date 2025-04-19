@@ -114,5 +114,91 @@ namespace Cumulative1.Controllers
             var contentResult = result as System.Web.Http.Results.OkNegotiatedContentResult<Teacher>;
             return View(contentResult.Content);
         }
+
+        // ============== PART 3: UPDATE FUNCTIONALITY ==============
+
+        /// <summary>
+        /// Displays the edit form for a specific teacher
+        /// </summary>
+        /// <param name="id">The ID of the teacher to edit</param>
+        /// <returns>
+        /// The edit view pre-populated with teacher data
+        /// Returns error view if teacher is not found
+        /// </returns>
+        /// <example>
+        /// GET: /Teacher/Edit/5
+        /// </example>
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            // Validate ID
+            if (id <= 0)
+            {
+                return View("Error", new HandleErrorInfo(
+                    new ArgumentException("Invalid Teacher ID - must be positive number"),
+                    "TeacherPage",
+                    "Edit"));
+            }
+
+            TeacherAPIController api = new TeacherAPIController();
+            var result = api.FindTeacher(id);
+
+            // Check if teacher was found
+            if (result is System.Web.Http.Results.NotFoundResult)
+            {
+                return View("Error", new HandleErrorInfo(
+                    new KeyNotFoundException($"Teacher with ID {id} not found"),
+                    "TeacherPage",
+                    "Edit"));
+            }
+
+            // Get the teacher object from the response
+            var contentResult = result as System.Web.Http.Results.OkNegotiatedContentResult<Teacher>;
+            Teacher teacher = contentResult.Content;
+
+            return View(teacher);
+        }
+
+        /// <summary>
+        /// Processes the submitted edit form (AJAX)
+        /// </summary>
+        /// <param name="id">The ID of the teacher being updated</param>
+        /// <param name="TeacherInfo">The updated teacher information</param>
+        /// <returns>
+        /// JSON result indicating success or failure
+        /// </returns>
+        /// <example>
+        /// POST: /Teacher/Update/5
+        /// </example>
+        [HttpPost]
+        public ActionResult Update(int id, Teacher TeacherInfo)
+        {
+            // This method is primarily for server-side validation in case JS is disabled
+            // The actual update will be handled via AJAX from the client side
+
+            if (id <= 0 || id != TeacherInfo.TeacherId)
+            {
+                return Json(new { success = false, message = "Invalid Teacher ID" });
+            }
+
+            TeacherAPIController api = new TeacherAPIController();
+            var result = api.UpdateTeacher(id, TeacherInfo);
+
+            if (result is System.Web.Http.Results.BadRequestErrorMessageResult badRequest)
+            {
+                return Json(new { success = false, message = badRequest.Message });
+            }
+            else if (result is System.Web.Http.Results.NotFoundResult)
+            {
+                return Json(new { success = false, message = "Teacher not found" });
+            }
+            else if (result is System.Web.Http.Results.InternalServerErrorResult)
+            {
+                return Json(new { success = false, message = "Server error occurred" });
+            }
+
+            return Json(new { success = true, message = "Teacher updated successfully" });
+        }
+
     }
 }

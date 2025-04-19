@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web.Mvc;
 using Cumulative1.Models;
 
@@ -9,67 +10,192 @@ namespace Cumulative1.Controllers
 {
     public class StudentPageController : Controller
     {
-        // GET: Student/List
+        private HttpClient client = new HttpClient();
+
+        public StudentPageController()
+        {
+            client.BaseAddress = new Uri("https://localhost:44394/");
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        // GET: StudentPage/List
         public ActionResult List()
         {
             try
             {
-                StudentAPIController controller = new StudentAPIController();
-                var response = controller.ListStudents();
-
+                HttpResponseMessage response = client.GetAsync("api/StudentPage/ListStudents").Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    var students = response.Content.ReadAsAsync<IEnumerable<Student>>().Result;
+                    var students = response.Content.ReadAsAsync<List<Student>>().Result;
                     return View(students);
                 }
-
-                ViewBag.ErrorMessage = "Error loading students: " + response.ReasonPhrase;
-                return View(new List<Student>());
+                else
+                {
+                    ViewBag.ErrorMessage = "Error: " + response.ReasonPhrase;
+                    return View(new List<Student>());
+                }
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = "Error: " + ex.Message;
+                ViewBag.ErrorMessage = "Exception: " + ex.Message;
                 return View(new List<Student>());
             }
         }
 
-        // GET: Student/Show/5
+        // GET: StudentPage/Show/5
         public ActionResult Show(int id)
         {
-            if (id <= 0)
-            {
-                return RedirectToAction("Error", new { message = "Invalid Student ID" });
-            }
-
             try
             {
-                StudentAPIController controller = new StudentAPIController();
-                var response = controller.FindStudent(id);
-
-                if (!response.IsSuccessStatusCode)
+                HttpResponseMessage response = client.GetAsync($"api/StudentPage/FindStudent/{id}").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var student = response.Content.ReadAsAsync<Student>().Result;
+                    return View(student);
+                }
+                else
                 {
                     return RedirectToAction("Error", new
                     {
                         message = response.StatusCode == HttpStatusCode.NotFound ?
-                        "Student not found" : "Error loading student information"
+                        "Student not found" : "Error loading student"
                     });
                 }
-
-                var student = response.Content.ReadAsAsync<Student>().Result;
-                if (student == null)
-                {
-                    return RedirectToAction("Error", new { message = "Student data could not be loaded" });
-                }
-
-                return View(student);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return RedirectToAction("Error", new { message = "An error occurred" });
+                return RedirectToAction("Error", new { message = ex.Message });
             }
         }
 
-        // GET: Student/Error
+        // GET: StudentPage/New
+        public ActionResult New()
+        {
+            return View();
+        }
+
+        // GET: StudentPage/Edit/5
+        public ActionResult Edit(int id)
+        {
+            try
+            {
+                HttpResponseMessage response = client.GetAsync($"api/StudentPage/FindStudent/{id}").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var student = response.Content.ReadAsAsync<Student>().Result;
+                    return View(student);
+                }
+                else
+                {
+                    return View("Error", new HandleErrorInfo(
+                        new Exception(response.ReasonPhrase),
+                        "StudentPage",
+                        "Edit"));
+                }
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "StudentPage", "Edit"));
+            }
+        }
+
+        // GET: StudentPage/DeleteConfirm/5
+        public ActionResult DeleteConfirm(int id)
+        {
+            try
+            {
+                HttpResponseMessage response = client.GetAsync($"api/StudentPage/FindStudent/{id}").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    var student = response.Content.ReadAsAsync<Student>().Result;
+                    return View(student);
+                }
+                else
+                {
+                    return View("Error", new HandleErrorInfo(
+                        new Exception(response.ReasonPhrase),
+                        "StudentPage",
+                        "DeleteConfirm"));
+                }
+            }
+            catch (Exception ex)
+            {
+                return View("Error", new HandleErrorInfo(ex, "StudentPage", "DeleteConfirm"));
+            }
+        }
+
+        // POST: StudentPage/Create
+        [HttpPost]
+        public ActionResult Create(Student student)
+        {
+            try
+            {
+                HttpResponseMessage response = client.PostAsJsonAsync("api/StudentPage/AddStudent", student).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("List");
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Error creating student: " + response.ReasonPhrase;
+                    return View("New", student);
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Exception: " + ex.Message;
+                return View("New", student);
+            }
+        }
+
+        // POST: StudentPage/Update/5
+        [HttpPost]
+        public ActionResult Update(int id, Student student)
+        {
+            try
+            {
+                HttpResponseMessage response = client.PutAsJsonAsync($"api/StudentPage/UpdateStudent/{id}", student).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Show", new { id = id });
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "Error updating student: " + response.ReasonPhrase;
+                    return View("Edit", student);
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Exception: " + ex.Message;
+                return View("Edit", student);
+            }
+        }
+
+        // POST: StudentPage/Delete/5
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                HttpResponseMessage response = client.DeleteAsync($"api/StudentPage/DeleteStudent/{id}").Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("List");
+                }
+                else
+                {
+                    return RedirectToAction("Error", new { message = "Error deleting student: " + response.ReasonPhrase });
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error", new { message = "Exception: " + ex.Message });
+            }
+        }
+
         public ActionResult Error(string message)
         {
             ViewBag.ErrorMessage = message;

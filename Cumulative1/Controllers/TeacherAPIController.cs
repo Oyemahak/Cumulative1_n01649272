@@ -314,6 +314,124 @@ namespace Cumulative1.Controllers
             }
         }
 
+        // ============== PART 3: UPDATE FUNCTIONALITY ==============
+
+        /// <summary>
+        /// Updates an existing teacher's information with comprehensive validation
+        /// </summary>
+        /// <param name="id">The ID of the teacher to update</param>
+        /// <param name="teacherInfo">Updated teacher information</param>
+        /// <returns>
+        /// HTTP response containing:
+        /// - 200 OK with success message when updated
+        /// - 400 Bad Request with validation errors
+        /// - 404 Not Found if teacher doesn't exist
+        /// - 500 Internal Server Error for database issues
+        /// </returns>
+        /// <example>
+        /// PUT: /api/TeacherPage/UpdateTeacher/5
+        /// Request Body: JSON representation of Teacher object with updated fields
+        /// </example>
+        [HttpPut]
+        [Route("api/TeacherPage/UpdateTeacher/{id}")]
+        public IHttpActionResult UpdateTeacher(int id, [FromBody] Teacher teacherInfo)
+        {
+            // Validate ID matches the teacher being updated
+            if (id <= 0 || id != teacherInfo.TeacherId)
+            {
+                return BadRequest("Invalid Teacher ID");
+            }
+
+            // Validate employee number format (T followed by digits)
+            if (string.IsNullOrWhiteSpace(teacherInfo.EmployeeNumber) ||
+                !System.Text.RegularExpressions.Regex.IsMatch(teacherInfo.EmployeeNumber, @"^T\d+$"))
+            {
+                return BadRequest("Employee number must start with 'T' followed by digits (e.g., T123)");
+            }
+
+            // Validate teacher name fields
+            if (string.IsNullOrWhiteSpace(teacherInfo.TeacherFname) ||
+                string.IsNullOrWhiteSpace(teacherInfo.TeacherLname))
+            {
+                return BadRequest("Both first and last name are required");
+            }
+
+            // Validate hire date is not in the future
+            if (teacherInfo.HireDate > DateTime.Today)
+            {
+                return BadRequest("Hire date cannot be in the future");
+            }
+
+            // Validate salary is positive
+            if (teacherInfo.Salary <= 0)
+            {
+                return BadRequest("Salary must be a positive value");
+            }
+
+            try
+            {
+                using (MySqlConnection Conn = School.AccessDatabase())
+                {
+                    Conn.Open();
+
+                    // Verify teacher exists first
+                    using (MySqlCommand checkCmd = new MySqlCommand(
+                        "SELECT COUNT(*) FROM teachers WHERE teacherid = @id", Conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@id", id);
+                        if (Convert.ToInt32(checkCmd.ExecuteScalar()) == 0)
+                        {
+                            return NotFound();
+                        }
+                    }
+
+                    // Check for duplicate employee number (excluding current teacher)
+                    using (MySqlCommand checkEmpCmd = new MySqlCommand(
+                        "SELECT COUNT(*) FROM teachers WHERE employeenumber = @empnum AND teacherid != @id", Conn))
+                    {
+                        checkEmpCmd.Parameters.AddWithValue("@empnum", teacherInfo.EmployeeNumber);
+                        checkEmpCmd.Parameters.AddWithValue("@id", id);
+                        if (Convert.ToInt32(checkEmpCmd.ExecuteScalar()) > 0)
+                        {
+                            return BadRequest("Employee number already in use by another teacher");
+                        }
+                    }
+
+                    // Update teacher record
+                    using (MySqlCommand cmd = new MySqlCommand(
+                        "UPDATE teachers SET " +
+                        "teacherfname = @fname, " +
+                        "teacherlname = @lname, " +
+                        "employeenumber = @empnum, " +
+                        "hiredate = @hiredate, " +
+                        "salary = @salary " +
+                        "WHERE teacherid = @id", Conn))
+                    {
+                        cmd.Parameters.AddWithValue("@fname", teacherInfo.TeacherFname);
+                        cmd.Parameters.AddWithValue("@lname", teacherInfo.TeacherLname);
+                        cmd.Parameters.AddWithValue("@empnum", teacherInfo.EmployeeNumber);
+                        cmd.Parameters.AddWithValue("@hiredate", teacherInfo.HireDate);
+                        cmd.Parameters.AddWithValue("@salary", teacherInfo.Salary);
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        cmd.Prepare();
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        if (rowsAffected == 0)
+                        {
+                            return InternalServerError(new Exception("Failed to update teacher"));
+                        }
+                    }
+                }
+
+                return Ok($"Teacher {id} updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
         /// <summary>
         /// Deletes a teacher from the system after validation checks
         /// </summary>

@@ -1,16 +1,27 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Cumulative1.Models
 {
     /// <summary>
-    /// Represents a student in the school system.
+    /// Represents a student in the school system
     /// </summary>
+    [DataContract]
     public class Student
     {
-        public int StudentId;
-        public string StudentFname;
-        public string StudentLname;
-        public string StudentNumber;
-        public DateTime EnrolDate;
+        [DataMember]
+        public int StudentId { get; set; }
+
+        [DataMember]
+        public string StudentFname { get; set; }
+
+        [DataMember]
+        public string StudentLname { get; set; }
+
+        [DataMember]
+        public string StudentNumber { get; set; }
+
+        [DataMember]
+        public DateTime EnrolDate { get; set; }
     }
 }
